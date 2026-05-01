@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POD 4 Ask Me Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Bricolage+Grotesque:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e2a;
+    --surface3: #1f2433;
+    --border: #2a2f40;
+    --border2: #353b52;
+    --text: #e8ecf5;
+    --text2: #8b95b0;
+    --text3: #5a6180;
+    --accent: #4f7cff;
+    --accent2: #7c5cff;
+    --green: #3dd68c;
+    --amber: #f59f1a;
+    --red: #ff5757;
+    --teal: #2ec4b6;
+    --pink: #ff6b9d;
+    --font: 'Bricolage Grotesque', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 28px 36px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 5px 12px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-family: var(--mono);
+  }
+
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .header h1 span { color: var(--text3); font-weight: 400; }
+
+  .last-updated {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .refresh-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .refresh-btn:hover {
+    background: var(--surface3);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    padding: 28px 36px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent-color, var(--accent));
+  }
+
+  .kpi-card:hover { border-color: var(--border2); }
+
+  .kpi-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .kpi-value {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+
+  /* FILTERS */
+  .filter-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 140px;
+  }
+
+  .filter-group label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    text-transform: uppercase;
+  }
+
+  select, input[type="text"] {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a6180' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+
+  input[type="text"] {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a6180' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+    padding-right: 12px;
+    padding-left: 30px;
+    background-position: left 10px center;
+  }
+
+  select:hover, input:hover { border-color: var(--border2); }
+  select:focus, input:focus { border-color: var(--accent); }
+
+  .filter-reset {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    height: 36px;
+  }
+
+  .filter-reset:hover { border-color: var(--red); color: var(--red); background: rgba(255,87,87,0.06); }
+
+  .filter-count {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text3);
+    margin-left: auto;
+    align-self: center;
+    white-space: nowrap;
+  }
+
+  .filter-count span { color: var(--accent); font-weight: 500; }
+
+  /* CONTENT GRID */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+  }
+
+  .chart-card.full { grid-column: 1 / -1; }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.02em;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::before {
+    content: '';
+    width: 3px;
+    height: 14px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* BAR CHARTS */
+  .bar-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .bar-item {
+    display: grid;
+    grid-template-columns: 140px 1fr 44px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .bar-label {
+    font-size: 12px;
+    color: var(--text2);
+    truncate: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--mono);
+  }
+
+  .bar-track {
+    height: 6px;
+    background: var(--surface3);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--accent);
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .bar-count {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text3);
+    text-align: right;
+  }
+
+  /* TABLE */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+
+  thead th {
+    padding: 10px 16px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    text-transform: uppercase;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  thead th:hover { color: var(--text2); }
+  thead th.sort-asc::after { content: ' ↑'; color: var(--accent); }
+  thead th.sort-desc::after { content: ' ↓'; color: var(--accent); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+
+  td {
+    padding: 10px 16px;
+    color: var(--text2);
+    vertical-align: top;
+  }
+
+  td.case-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  td.merchant-name {
+    font-weight: 500;
+    color: var(--text);
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  td.issue-text {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text3);
+    font-size: 11.5px;
+  }
+
+  td.submitted-by {
+    white-space: nowrap;
+    font-size: 11.5px;
+  }
+
+  /* CATEGORY PILLS */
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .pill-website { background: rgba(79,124,255,0.15); color: #7da4ff; }
+  .pill-online-ordering { background: rgba(61,214,140,0.15); color: #5de8a8; }
+  .pill-menu { background: rgba(245,159,26,0.15); color: #f7b84a; }
+  .pill-integrations { background: rgba(255,107,157,0.15); color: #ff8bb6; }
+  .pill-catalog { background: rgba(46,196,182,0.15); color: #57d9cc; }
+  .pill-boh { background: rgba(124,92,255,0.15); color: #a07aff; }
+  .pill-other { background: rgba(90,97,128,0.15); color: #8b95b0; }
+  .pill-print-routes { background: rgba(255,87,87,0.15); color: #ff8080; }
+  .pill-foh { background: rgba(255,160,50,0.15); color: #ffa832; }
+
+  /* SERVICE PLAN PILL */
+  .plan-pill {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: var(--mono);
+    background: var(--surface3);
+    color: var(--text3);
+    white-space: nowrap;
+  }
+
+  /* DATE */
+  .date-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    white-space: nowrap;
+  }
+
+  /* HUB LINK */
+  .hub-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 11px;
+    font-family: var(--mono);
+  }
+
+  .hub-link:hover { text-decoration: underline; }
+
+  /* PAGINATION */
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 22px;
+    border-top: 1px solid var(--border);
+    justify-content: flex-end;
+  }
+
+  .page-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text3);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .page-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .page-info {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    margin-right: auto;
+  }
+
+  /* LOADING */
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    gap: 16px;
+    color: var(--text3);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-msg {
+    background: rgba(255,87,87,0.08);
+    border: 1px solid rgba(255,87,87,0.2);
+    border-radius: 10px;
+    padding: 18px 22px;
+    color: var(--red);
+    font-family: var(--mono);
+    font-size: 13px;
+    margin: 20px 0;
+  }
+
+  /* TIMELINE */
+  .timeline-bar-list { display: flex; flex-direction: column; gap: 6px; }
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 80px 1fr 36px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* EMPTY */
+  .empty {
+    text-align: center;
+    padding: 48px;
+    color: var(--text3);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* overflow table wrapper */
+  .table-wrapper { overflow-x: auto; }
+
+  @media (max-width: 1100px) {
+    .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    .content-grid { grid-template-columns: 1fr; }
+    .content-grid .chart-card.full { grid-column: 1; }
+  }
+
+  @media (max-width: 700px) {
+    .header, .main { padding: 16px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <div class="badge">POD 4</div>
+    <h1>Ask Me <span>/ Support Dashboard</span></h1>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <div class="last-updated">
+      <div class="live-dot"></div>
+      <span id="last-updated-text">Loading...</span>
+    </div>
+    <button class="refresh-btn" onclick="loadData()">
+      ↻ Refresh
+    </button>
+  </div>
+</header>
+
+<main class="main">
+  <div id="app-content">
+    <div class="loading">
+      <div class="spinner"></div>
+      <span>Connecting to Google Sheets...</span>
+    </div>
+  </div>
+</main>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+const SHEET_ID = '1voD02VvnjfKpi8Adt22hq0zVIa8nP_swM7PucCPcBf4';
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+
+// ─── STATE ────────────────────────────────────────────────
+let allRows = [];
+let filtered = [];
+let sortCol = 8; // timestamp
+let sortDir = 'desc';
+let page = 1;
+const PAGE_SIZE = 25;
+
+let filters = {
+  search: '',
+  category: '',
+  submitter: '',
+  plan: '',
+  dateRange: 'all'
+};
+
+// ─── DATA LOAD ────────────────────────────────────────────
+async function loadData() {
+  document.getElementById('app-content').innerHTML = `
+    <div class="loading"><div class="spinner"></div><span>Fetching data from Google Sheets...</span></div>`;
+
+  try {
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const csv = await res.text();
+    allRows = parseCSV(csv);
+    document.getElementById('last-updated-text').textContent =
+      'Updated ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    applyFilters();
+    render();
+  } catch (e) {
+    document.getElementById('app-content').innerHTML = `
+      <div class="error-msg">⚠ Could not load data: ${e.message}. Make sure the sheet is publicly accessible ("Anyone with the link can view").</div>`;
+  }
+}
+
+// ─── CSV PARSER ───────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = splitCSVLine(lines[i]);
+    if (cols.length < 2 || !cols[0]) continue;
+    rows.push({
+      caseNum:   clean(cols[0]),
+      hubLink:   clean(cols[1]),
+      plan:      clean(cols[2]),
+      bohName:   clean(cols[3]),
+      category:  clean(cols[4]),
+      issue:     clean(cols[5]),
+      actions:   clean(cols[6]),
+      submitter: clean(cols[7]),
+      timestamp: parseDate(clean(cols[8])),
+      rawDate:   clean(cols[8])
+    });
+  }
+  return rows.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+}
+
+function splitCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (ch === ',' && !inQuotes) {
+      result.push(current); current = '';
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+function clean(s) { return (s || '').trim().replace(/^"|"$/g, ''); }
+
+function parseDate(s) {
+  if (!s) return null;
+  try { return new Date(s).getTime(); }
+  catch { return null; }
+}
+
+// ─── FILTERS ──────────────────────────────────────────────
+function applyFilters() {
+  const now = Date.now();
+  const week = 7 * 24 * 3600 * 1000;
+  const month = 30 * 24 * 3600 * 1000;
+  const searchLow = filters.search.toLowerCase();
+
+  filtered = allRows.filter(r => {
+    if (filters.dateRange === 'week' && r.timestamp && (now - r.timestamp) > week) return false;
+    if (filters.dateRange === 'month' && r.timestamp && (now - r.timestamp) > month) return false;
+    if (filters.category && r.category !== filters.category) return false;
+    if (filters.submitter && r.submitter !== filters.submitter) return false;
+    if (filters.plan && r.plan !== filters.plan) return false;
+    if (searchLow && !r.caseNum.toLowerCase().includes(searchLow) &&
+        !r.bohName.toLowerCase().includes(searchLow) &&
+        !r.issue.toLowerCase().includes(searchLow) &&
+        !r.submitter.toLowerCase().includes(searchLow)) return false;
+    return true;
+  });
+
+  // sort
+  filtered.sort((a, b) => {
+    const vals = [a.caseNum, a.hubLink, a.plan, a.bohName, a.category, a.issue, a.actions, a.submitter, a.timestamp];
+    const bvals = [b.caseNum, b.hubLink, b.plan, b.bohName, b.category, b.issue, b.actions, b.submitter, b.timestamp];
+    const av = vals[sortCol] || '';
+    const bv = bvals[sortCol] || '';
+    const cmp = typeof av === 'number' ? av - bv : String(av).localeCompare(String(bv));
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+
+  page = 1;
+}
+
+// ─── UNIQUE VALUES ────────────────────────────────────────
+function unique(arr, key) {
+  return [...new Set(arr.map(r => r[key]).filter(Boolean))].sort();
+}
+
+function countBy(arr, key) {
+  const map = {};
+  arr.forEach(r => {
+    const k = r[key] || 'Unknown';
+    map[k] = (map[k] || 0) + 1;
+  });
+  return Object.entries(map).sort((a,b) => b[1] - a[1]);
+}
+
+// ─── RENDER ───────────────────────────────────────────────
+function render() {
+  const cats = unique(allRows, 'category');
+  const submitters = unique(allRows, 'submitter');
+  const plans = unique(allRows, 'plan');
+
+  const catCounts = countBy(filtered, 'category');
+  const submitterCounts = countBy(filtered, 'submitter');
+  const planCounts = countBy(filtered, 'plan');
+
+  const maxCat = catCounts[0]?.[1] || 1;
+  const maxSub = submitterCounts[0]?.[1] || 1;
+  const maxPlan = planCounts[0]?.[1] || 1;
+
+  // KPIs
+  const total = filtered.length;
+  const websiteCount = filtered.filter(r => r.category === 'Website').length;
+  const uniqueSubmitters = new Set(filtered.map(r => r.submitter).filter(Boolean)).size;
+  const uniqueMerchants = new Set(filtered.map(r => r.bohName).filter(v => v && v.toLowerCase() !== 'na' && v !== 'N/A' && v !== '-')).size;
+  const thisWeek = filtered.filter(r => r.timestamp && (Date.now() - r.timestamp) < 7*24*3600*1000).length;
+
+  // Timeline (by month)
+  const byMonth = {};
+  filtered.forEach(r => {
+    if (!r.timestamp) return;
+    const d = new Date(r.timestamp);
+    const key = d.toLocaleDateString('en-US', {month:'short', year:'2-digit'});
+    byMonth[key] = (byMonth[key] || 0) + 1;
+  });
+  const monthEntries = Object.entries(byMonth).sort((a,b) => {
+    const da = new Date(a[0]); const db = new Date(b[0]);
+    return da - db;
+  });
+  const maxMonth = Math.max(...monthEntries.map(e => e[1]), 1);
+
+  // Paged rows
+  const start = (page - 1) * PAGE_SIZE;
+  const pageRows = filtered.slice(start, start + PAGE_SIZE);
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+
+  document.getElementById('app-content').innerHTML = `
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card" style="--accent-color: var(--accent)">
+        <div class="kpi-label">Total Tickets</div>
+        <div class="kpi-value">${total.toLocaleString()}</div>
+        <div class="kpi-sub">of ${allRows.length.toLocaleString()} total</div>
+      </div>
+      <div class="kpi-card" style="--accent-color: var(--amber)">
+        <div class="kpi-label">This Week</div>
+        <div class="kpi-value" style="color:var(--amber)">${thisWeek}</div>
+        <div class="kpi-sub">last 7 days</div>
+      </div>
+      <div class="kpi-card" style="--accent-color: var(--teal)">
+        <div class="kpi-label">Website Issues</div>
+        <div class="kpi-value" style="color:var(--teal)">${websiteCount}</div>
+        <div class="kpi-sub">${total ? Math.round(websiteCount/total*100) : 0}% of tickets</div>
+      </div>
+      <div class="kpi-card" style="--accent-color: var(--green)">
+        <div class="kpi-label">Active Agents</div>
+        <div class="kpi-value" style="color:var(--green)">${uniqueSubmitters}</div>
+        <div class="kpi-sub">submitting tickets</div>
+      </div>
+      <div class="kpi-card" style="--accent-color: var(--pink)">
+        <div class="kpi-label">Merchants Helped</div>
+        <div class="kpi-value" style="color:var(--pink)">${uniqueMerchants}</div>
+        <div class="kpi-sub">unique businesses</div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-section">
+      <div class="filter-group" style="min-width:200px;">
+        <label>Search</label>
+        <input type="text" id="f-search" placeholder="Case #, merchant, issue..." value="${filters.search}">
+      </div>
+      <div class="filter-group">
+        <label>Category</label>
+        <select id="f-category">
+          <option value="">All Categories</option>
+          ${cats.map(c => `<option value="${c}" ${filters.category===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Submitted By</label>
+        <select id="f-submitter">
+          <option value="">All Agents</option>
+          ${submitters.map(s => `<option value="${s}" ${filters.submitter===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Service Plan</label>
+        <select id="f-plan">
+          <option value="">All Plans</option>
+          ${plans.map(p => `<option value="${p}" ${filters.plan===p?'selected':''}>${p}</option>`).join('')}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Date Range</label>
+        <select id="f-date">
+          <option value="all" ${filters.dateRange==='all'?'selected':''}>All Time</option>
+          <option value="week" ${filters.dateRange==='week'?'selected':''}>Last 7 Days</option>
+          <option value="month" ${filters.dateRange==='month'?'selected':''}>Last 30 Days</option>
+        </select>
+      </div>
+      <button class="filter-reset" onclick="resetFilters()">✕ Clear</button>
+      <div class="filter-count">Showing <span>${filtered.length}</span> tickets</div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="content-grid">
+      <div class="chart-card">
+        <div class="card-title">Tickets by Category</div>
+        <div class="bar-list">
+          ${catCounts.slice(0,8).map(([cat, count]) => `
+            <div class="bar-item">
+              <div class="bar-label" title="${cat}">${cat}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${Math.round(count/maxCat*100)}%;background:${catColor(cat)}"></div></div>
+              <div class="bar-count">${count}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-title">Tickets by Agent</div>
+        <div class="bar-list">
+          ${submitterCounts.slice(0,8).map(([sub, count], i) => `
+            <div class="bar-item">
+              <div class="bar-label" title="${sub}">${sub.split(' ').slice(0,2).join(' ')}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${Math.round(count/maxSub*100)}%;background:var(--accent2)"></div></div>
+              <div class="bar-count">${count}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-title">By Service Plan</div>
+        <div class="bar-list">
+          ${planCounts.slice(0,6).map(([plan, count]) => `
+            <div class="bar-item">
+              <div class="bar-label" title="${plan}">${plan.replace('SpotOn ','')}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${Math.round(count/maxPlan*100)}%;background:var(--teal)"></div></div>
+              <div class="bar-count">${count}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-title">Volume by Month</div>
+        <div class="timeline-bar-list">
+          ${monthEntries.slice(-8).map(([month, count]) => `
+            <div class="timeline-item">
+              <div class="bar-label" style="font-size:11px">${month}</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${Math.round(count/maxMonth*100)}%;background:var(--green)"></div></div>
+              <div class="bar-count">${count}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="card-title" style="margin-bottom:0">Ticket Log</div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="setSort(0)" class="${sortCol===0?'sort-'+sortDir:''}">Case #</th>
+              <th onclick="setSort(4)" class="${sortCol===4?'sort-'+sortDir:''}">Category</th>
+              <th onclick="setSort(3)" class="${sortCol===3?'sort-'+sortDir:''}">Merchant</th>
+              <th onclick="setSort(5)" class="${sortCol===5?'sort-'+sortDir:''}">Issue</th>
+              <th onclick="setSort(7)" class="${sortCol===7?'sort-'+sortDir:''}">Agent</th>
+              <th onclick="setSort(2)" class="${sortCol===2?'sort-'+sortDir:''}">Plan</th>
+              <th onclick="setSort(8)" class="${sortCol===8?'sort-'+sortDir:''}">Date</th>
+              <th>Hub</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pageRows.length ? pageRows.map(r => `
+              <tr>
+                <td class="case-num">${r.caseNum ? r.caseNum.substring(0,12) : '—'}</td>
+                <td><span class="pill ${catPill(r.category)}">${r.category || '—'}</span></td>
+                <td class="merchant-name" title="${r.bohName}">${r.bohName || '—'}</td>
+                <td class="issue-text" title="${r.issue}">${r.issue || '—'}</td>
+                <td class="submitted-by">${r.submitter || '—'}</td>
+                <td><span class="plan-pill">${(r.plan||'—').replace('SpotOn ','')}</span></td>
+                <td class="date-text">${formatDate(r.timestamp)}</td>
+                <td>${r.hubLink && r.hubLink.startsWith('http') ? `<a class="hub-link" href="${r.hubLink}" target="_blank" rel="noopener">↗ Hub</a>` : '—'}</td>
+              </tr>`).join('') : `<tr><td colspan="8" class="empty">No tickets match your filters.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <div class="page-info">Page ${page} of ${totalPages || 1} · ${filtered.length} results</div>
+        <button class="page-btn" onclick="setPage(page-1)" ${page===1?'disabled':''}>← Prev</button>
+        ${Array.from({length: Math.min(7, totalPages)}, (_,i) => {
+          const p = totalPages <= 7 ? i+1 : (page <= 4 ? i+1 : (page >= totalPages-3 ? totalPages-6+i : page-3+i));
+          if (p < 1 || p > totalPages) return '';
+          return `<button class="page-btn ${p===page?'active':''}" onclick="setPage(${p})">${p}</button>`;
+        }).join('')}
+        <button class="page-btn" onclick="setPage(page+1)" ${page>=totalPages?'disabled':''}>Next →</button>
+      </div>
+    </div>
+  `;
+
+  // Attach filter listeners
+  document.getElementById('f-search').addEventListener('input', e => { filters.search = e.target.value; applyFilters(); render(); });
+  document.getElementById('f-category').addEventListener('change', e => { filters.category = e.target.value; applyFilters(); render(); });
+  document.getElementById('f-submitter').addEventListener('change', e => { filters.submitter = e.target.value; applyFilters(); render(); });
+  document.getElementById('f-plan').addEventListener('change', e => { filters.plan = e.target.value; applyFilters(); render(); });
+  document.getElementById('f-date').addEventListener('change', e => { filters.dateRange = e.target.value; applyFilters(); render(); });
+}
+
+// ─── HELPERS ──────────────────────────────────────────────
+function catColor(cat) {
+  const map = {
+    'Website': 'var(--accent)',
+    'Online Ordering': 'var(--green)',
+    'Menu': 'var(--amber)',
+    'Integrations': 'var(--pink)',
+    'Catalog': 'var(--teal)',
+    'BOH': 'var(--accent2)',
+    'FOH': '#ffa832',
+    'Print Routes': 'var(--red)',
+    'Other': 'var(--text3)'
+  };
+  return map[cat] || 'var(--text3)';
+}
+
+function catPill(cat) {
+  const map = {
+    'Website': 'pill-website',
+    'Online Ordering': 'pill-online-ordering',
+    'Menu': 'pill-menu',
+    'Integrations': 'pill-integrations',
+    'Catalog': 'pill-catalog',
+    'BOH': 'pill-boh',
+    'FOH': 'pill-foh',
+    'Print Routes': 'pill-print-routes',
+    'Other': 'pill-other'
+  };
+  return map[cat] || 'pill-other';
+}
+
+function formatDate(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'2-digit'});
+}
+
+function setSort(col) {
+  if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortCol = col; sortDir = 'desc'; }
+  applyFilters();
+  render();
+}
+
+function setPage(p) {
+  page = p;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetFilters() {
+  filters = { search: '', category: '', submitter: '', plan: '', dateRange: 'all' };
+  applyFilters();
+  render();
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
